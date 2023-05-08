@@ -1,33 +1,46 @@
 import socket
 import json
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-def get_employee_data():
-    # get employee details from user
-    first_name = input("Enter first name: ")
-    last_name = input("Enter last name: ")
-    age = int(input("Enter age: "))
-    currently_employed = input("Currently employed? (y/n): ").lower() == 'y'
+def get_employee_data_from_browser():
+    # create a new Chrome browser window
+    browser = webdriver.Chrome()
 
-    # create a dictionary to hold employee details
-    employee_data = {
-        "first_name": first_name,
-        "last_name": last_name,
-        "age": age,
-        "currently_employed": currently_employed
-    }
+    # navigate to the page with the employee data form
+    browser.get("http://localhost:5000")
 
-    # serialize dictionary to JSON string
-    json_data = json.dumps(employee_data)
-    print(json_data)
+    # fill out the form and submit it
+    first_name_field = browser.find_element(By.NAME, "first_name")
+    first_name_field.send_keys("John")
+
+    last_name_field = browser.find_element(By.NAME, "last_name")
+    last_name_field.send_keys("Doe")
+
+    age_field = browser.find_element(By.NAME, "age")
+    age_field.send_keys("30")
+
+    currently_employed_field = browser.find_element(By.NAME, "currently_employed")
+    currently_employed_field.click()
+
+    submit_button = browser.find_element(By.CSS_SELECTOR, "button[type='submit']")
+    submit_button.click()
+
+    # wait for the response page to load and extract the JSON data
+    json_data = browser.find_element(By.CSS_SELECTOR, "pre").text
+
+    # close the browser window
+    browser.quit()
 
     return json_data
+
 
 def connect_to_server():
     # create socket object
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # get local machine name
-    server_address = ('localhost', 8000)
+    server_address = ('localhost', 8001)
 
     # connect to the server
     try:
@@ -36,8 +49,8 @@ def connect_to_server():
         print(f"Error connecting to server: {e}")
         return
 
-    # get employee data
-    json_data = get_employee_data()
+    # get employee data from browser
+    json_data = get_employee_data_from_browser()
 
     # send employee data to server
     try:
