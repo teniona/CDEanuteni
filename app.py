@@ -19,7 +19,6 @@ def employee():
         currently_employed = data['currently-employed']
 
         # do something with the employee data (e.g. save to database)
-        # ...
 
         # return a JSON response
         response = {'employee_name': f'{first_name} {last_name}', 'employee_age': age, 'employee_currently_employed': currently_employed}
