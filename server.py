@@ -10,8 +10,7 @@ def handle_employee_data():
     employee_data = request.get_json()
 
     # process employee data
-    # here, can add code to store employee data in a database or file
-    # for now, just return the data as a JSON response
+    # return the data as a JSON response
     response_data = {
         "status": "success",
         "employee_name": f"{employee_data['first_name']} {employee_data['last_name']}",
