@@ -55,36 +55,46 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+  const form = document.getElementById('employee-form');
+  const responseMessage = document.getElementById('response-message');
 
-const submitButton = document.querySelector('button[type="submit"]');
-const responseMessage = document.querySelector('#response-message');
-
-submitButton.addEventListener('click', (event) => {
+  form.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    // make an AJAX request to the server
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/employee');
-    xhr.setRequestHeader('Content-Type', 'application/json');
+    // Check if the form is valid
+    if (!form.checkValidity()) {
+      event.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
 
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            // parse the JSON response
-            const data = JSON.parse(xhr.responseText);
+    // Remove the validation classes
+    form.classList.remove('was-validated');
 
-            // display the response data on the webpage
-            responseMessage.textContent = `Name: ${data.employee_name}, Age: ${data.employee_age}, Currently Employed: ${data.employee_currently_employed}`;
-        } else {
-            // handle the error
-            responseMessage.textContent = 'Error: Unable to submit form data.';
-        }
-    };
-
-    // extract form data and send it as a JSON payload
-    const formData = new FormData(event.target.form);
+    // Make an AJAX request to the server
+    const formData = new FormData(form);
     const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
-    xhr.send(jsonData);
-});
 
+    axios.post('/employee', jsonData, { headers: { 'Content-Type': 'application/json' } })
+      .then(response => {
+        // Check if the response contains an error
+        if (response.data.error) {
+          responseMessage.textContent = `Error: ${response.data.error}`;
+        } else {
+          // Display the response data on the webpage
+          const data = response.data;
+          responseMessage.textContent = `Name: ${data.employee_name}, Age: ${data.employee_age}, Currently Employed: ${data.employee_currently_employed}`;
+        }
+      })
+      .catch(error => {
+        // Handle the error
+        if (error.response) {
+          // The request was made and the server responded with a non-2xx status code
+          responseMessage.textContent = `Error: ${error.response.data.error}`;
+        } else {
+          // Error occurred while making the request
+          responseMessage.textContent = 'Error: Unable to submit form data.';
+        }
+      });
+  });
 </script>
-
