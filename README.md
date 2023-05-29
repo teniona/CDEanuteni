@@ -15,8 +15,8 @@ pipenv install
 3. Run Flask App:
 
 
-*export FLASK_APP=app.py
-*flask run
+* export FLASK_APP=app.py
+* flask run
 
 **RUNNING THE PROGRAM**
 
