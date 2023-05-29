@@ -18,14 +18,19 @@ def employee():
         age = data['age']
         currently_employed = data['currently-employed']
 
-        # do something with the employee data (e.g. save to database)
+        # perform validation on the extracted data
+        if not (first_name and last_name and age and currently_employed):
+            # return an error response if any required field is missing
+            return jsonify({'error': 'Invalid request data. Please make sure all required fields are included.'}), 400
+
+        # do something with the validated employee data (e.g. save to database)
 
         # return a JSON response
         response = {'employee_name': f'{first_name} {last_name}', 'employee_age': age, 'employee_currently_employed': currently_employed}
         return jsonify(response)
     except KeyError:
+        # handle KeyError if any of the required fields are missing
         return jsonify({'error': 'Invalid request data. Please make sure all required fields are included.'}), 400
-
 
 
 
